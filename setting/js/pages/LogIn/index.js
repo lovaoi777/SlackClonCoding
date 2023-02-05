@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
+
 const LogIn = () => {
   const navigator = useNavigate();
   const [email, onChangeEmail] = useInput(' ');
@@ -22,15 +23,16 @@ const LogIn = () => {
       setLogInError(false);
       axios
         .post('/api/users/login', { email, password }, { withCredentials: true })
-        .then(() => {
+        .then((response) => {
           console.log(response.data, '응답');
           mutate(response.data, false);
         })
         .catch((error) => {
           setLogInError(error.response?.data?.statusCode == 401);
+          alert(error);
         });
     },
-    [email, password],
+    [email, password, mutate],
   );
   if (data === undefined) {
     return <div>로딩중...</div>;

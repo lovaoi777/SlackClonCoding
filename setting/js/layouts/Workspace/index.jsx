@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
@@ -32,6 +32,7 @@ import {
 import { Label, Input, Button } from '@pages/SignUp/styles';
 import gravatar from 'gravatar';
 import useInput from '@hooks/useInput';
+import useSocket from '@hooks/useSocket';
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
@@ -51,8 +52,21 @@ const Workspace = () => {
   const { workspace } = params;
 
   const { data: channelData } = useSWR(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher); //서로 부터 데이터를 받아온다
-  const { data: MemberData } = useSWR(userData ? `/api/workspaces/${workspace}/channels/members` : null, fetcher);
+  // const { data: MemberData } = useSWR(userData ? `/api/workspaces/${workspace}/channels/members` : null, fetcher);
+  const [socket, disconnect] = useSocket(workspace);
 
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      console.log(socket);
+      socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [socket, channelData, userData]);
+
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace, disconnect]);
   const onLogout = useCallback(() => {
     axios
       .post('/api/users/logout', {
@@ -65,7 +79,7 @@ const Workspace = () => {
         console.log('데이터', userData);
         console.log(Error);
       });
-  }, []);
+  }, [userData]);
 
   if (!userData) {
     navigator('/login');
