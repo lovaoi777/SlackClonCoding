@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 import ChatBox from '@components/ChatBox';
 import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
-import useSWRInfinite from 'swr/infinite';
 import axios from 'axios';
 
 const DirectMessage = () => {
@@ -16,10 +15,10 @@ const DirectMessage = () => {
   const { data: myData } = useSWR('/api/users', fetcher);
   const [chat, onChangeChat, setchat] = useInput('');
   const {
-    data: chatDatam,
+    data: chatData,
     mutate: mutateChat,
-    revlidata,
-  } = useSWRInfinite(`/api/workspace/${workspace}/dms/${id}/chats?perPage=20&page=1`);
+    revalidate,
+  } = useSWR(`/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`, fetcher);
 
   const onSubmitForm = useCallback(
     (e) => {
@@ -27,15 +26,15 @@ const DirectMessage = () => {
       console.log(chat);
       if (chat?.trim()) {
         axios
-          .post(`/api/workspaces/${workspace}/${id}/chats`, { content: chat })
+          .post(`/api/workspaces/${workspace}/dms/${id}/chats`, { content: chat })
           .then(() => {
-            revlidata();
+            mutateChat();
             setchat('');
           })
           .catch(console.error);
       }
     },
-    [chat],
+    [chat, mutateChat, id, workspace, setchat],
   );
 
   if (!userData || !myData) {
@@ -47,7 +46,7 @@ const DirectMessage = () => {
         <img src={gravatar.url(userData.email, { s: '24px', d: 'retro' })} alt={userData.nickname} />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList />
+      <ChatList chatData={chatData} />
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
     </Container>
   );

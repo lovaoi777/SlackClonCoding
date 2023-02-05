@@ -25,7 +25,7 @@ const LogIn = () => {
         .post('/api/users/login', { email, password }, { withCredentials: true })
         .then((response) => {
           console.log(response.data, '응답');
-          mutate(response.data, false);
+          revalidate();
         })
         .catch((error) => {
           setLogInError(error.response?.data?.statusCode == 401);
