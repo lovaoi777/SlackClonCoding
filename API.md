@@ -48,6 +48,8 @@ HTTP 요청 리스트(ajax)
 - body: { content: string(내용) }
 - return: 'ok'
 - dm 소켓 이벤트가 emit됨
+
+
 ### POST /workspaces/:workspace/dms/:id/images
 - :workspace 내부의 :id에게 보낸 이미지 저장
 - body: { image: 이미지(multipart) }

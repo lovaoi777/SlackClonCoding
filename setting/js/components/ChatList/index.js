@@ -3,7 +3,7 @@ import { ChatZone, Section, StickyHeader } from '@components/ChatList/style';
 import Chat from '@components/Chat';
 import { Scrollbars } from 'react-custom-scrollbars';
 const ChatList = ({ chatData }) => {
-  const scrollbarRef = useRef(null);
+  const scrollbarRef = useRef(null  );
   const onScorll = useCallback(() => {}, []);
   return (
     <ChatZone>
